@@ -532,6 +532,67 @@
     margin-bottom: 1.8rem;
   }
 
+  .modal-code-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.85rem 1.1rem;
+    border: 1px solid rgba(184,149,106,0.25);
+    background: rgba(184,149,106,0.05);
+    margin-bottom: 1.8rem;
+  }
+
+  .modal-code-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .modal-code-label {
+    font-size: 0.62rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .modal-code-value {
+    font-family: 'Jost', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 0.1em;
+    color: var(--cream);
+    font-weight: 500;
+  }
+
+  .modal-copy-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0.9rem;
+    background: none;
+    border: 1px solid rgba(184,149,106,0.4);
+    color: var(--gold);
+    font-family: 'Jost', sans-serif;
+    font-size: 0.65rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.3s, border-color 0.3s, color 0.3s;
+    white-space: nowrap;
+  }
+
+  .modal-copy-btn:hover {
+    background: rgba(184,149,106,0.1);
+    border-color: var(--gold);
+  }
+
+  .modal-copy-btn.copied {
+    background: var(--gold);
+    color: var(--dark);
+    border-color: var(--gold);
+  }
+
   .modal-notes {
     display: flex;
     flex-direction: column;
@@ -893,6 +954,13 @@
       <h2 class="modal-name" id="modal-name"></h2>
     </div>
     <div class="modal-body">
+      <div class="modal-code-box">
+        <div class="modal-code-left">
+          <span class="modal-code-label">Product Code</span>
+          <span class="modal-code-value" id="modal-code"></span>
+        </div>
+        <button class="modal-copy-btn" id="modal-copy-btn" onclick="copyProductCode()" type="button">Copy</button>
+      </div>
       <p class="modal-long-desc" id="modal-long-desc"></p>
       <div class="modal-notes" id="modal-notes"></div>
     </div>
@@ -3853,7 +3921,7 @@
     panel.style.border = '';
 
     panel.innerHTML = displayed.map((p, i) => {
-      const num = String(p.number).padStart(2, '0');
+      const num = p.number;
       const displayName = highlightMatch(p.name, query);
       const idx = list.indexOf(p);
       return `<div class="perfume-card" onclick="openModal('${gender}', ${idx})">
@@ -3929,15 +3997,49 @@
 
   function openModal(gender, idx) {
     const p = PERFUMES[gender][idx];
-    const num = String(p.number).padStart(2, '0');
+    const num = p.number;
     document.getElementById('modal-number').textContent = 'No. ' + num + ' â€” ' + (gender === 'male' ? 'For Him' : 'For Her');
     document.getElementById('modal-name').textContent = p.name;
+    document.getElementById('modal-code').textContent = 'NO.' + num;
     document.getElementById('modal-long-desc').textContent = p.longDesc;
     document.getElementById('modal-notes').innerHTML = `
       <div class="modal-notes-row"><span class="modal-notes-label">Top Notes</span><span class="modal-notes-value">${p.notes}</span></div>
     `;
+    const copyBtn = document.getElementById('modal-copy-btn');
+    copyBtn.textContent = 'Copy';
+    copyBtn.classList.remove('copied');
     document.getElementById('modal-backdrop').classList.add('open');
     document.body.style.overflow = 'hidden';
+  }
+
+  function copyProductCode() {
+    const code = document.getElementById('modal-code').textContent;
+    const btn = document.getElementById('modal-copy-btn');
+    const showCopied = () => {
+      btn.textContent = 'Copied';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = 'Copy';
+        btn.classList.remove('copied');
+      }, 1500);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(code).then(showCopied).catch(() => fallbackCopy(code, showCopied));
+    } else {
+      fallbackCopy(code, showCopied);
+    }
+  }
+
+  function fallbackCopy(text, onDone) {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(textarea);
+    onDone();
   }
 
   function closeModalDirect() {
@@ -3972,7 +4074,7 @@
 </script>
 <!-- WHATSAPP -->
 <div class="wa-wrap">
-  <a class="wa-btn" href="https://wa.me/27723766747?text=Hi%2C%20I%27d%20like%20to%20know%20more%20about%20your%20fragrances." target="_blank" rel="noopener" aria-label="Chat on WhatsApp">
+  <a class="wa-btn" href="https://wa.me/27760273746?text=Hi%2C%20I%27d%20like%20to%20know%20more%20about%20your%20fragrances." target="_blank" rel="noopener" aria-label="Chat on WhatsApp">
     <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" fill="white">
       <path d="M16 2C8.268 2 2 8.268 2 16c0 2.444.655 4.733 1.8 6.707L2 30l7.5-1.768A13.94 13.94 0 0 0 16 30c7.732 0 14-6.268 14-14S23.732 2 16 2zm0 25.6a11.54 11.54 0 0 1-5.9-1.617l-.424-.252-4.453 1.05 1.082-4.33-.277-.445A11.56 11.56 0 0 1 4.4 16C4.4 9.593 9.593 4.4 16 4.4S27.6 9.593 27.6 16 22.407 27.6 16 27.6zm6.344-8.67c-.348-.174-2.06-1.016-2.38-1.132-.32-.116-.552-.174-.784.174-.232.347-.9 1.132-1.103 1.364-.203.232-.406.26-.754.086-.348-.174-1.47-.542-2.8-1.728-1.034-.924-1.732-2.065-1.935-2.413-.203-.347-.022-.535.153-.708.157-.156.348-.406.522-.61.174-.202.232-.347.348-.579.116-.232.058-.434-.029-.608-.087-.174-.784-1.89-1.074-2.588-.283-.68-.57-.587-.784-.598l-.667-.012c-.232 0-.608.087-.927.434-.319.347-1.219 1.19-1.219 2.904s1.248 3.368 1.422 3.6c.174.232 2.456 3.748 5.952 5.258.832.359 1.482.573 1.988.733.835.266 1.595.228 2.196.138.67-.1 2.06-.842 2.351-1.656.29-.813.29-1.51.203-1.657-.086-.145-.318-.232-.666-.405z"/>
     </svg>
