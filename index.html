@@ -3998,7 +3998,7 @@
   function openModal(gender, idx) {
     const p = PERFUMES[gender][idx];
     const num = p.number;
-    document.getElementById('modal-number').textContent = 'No. ' + num + ' â€” ' + (gender === 'male' ? 'For Him' : 'For Her');
+    document.getElementById('modal-number').textContent = 'No. ' + num + ' — ' + (gender === 'male' ? 'For Him' : 'For Her');
     document.getElementById('modal-name').textContent = p.name;
     document.getElementById('modal-code').textContent = 'NO.' + num;
     document.getElementById('modal-long-desc').textContent = p.longDesc;
